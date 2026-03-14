@@ -1,2 +1,3 @@
-# macOS-Liquid-Glass-blender-theme
-This is a Blender theme emulating Liquid Glass on macOS, based on another theme created by stoatsnhoney.
+# All my addons
+## MacOS Liquid Glass Theme
+It is a modified version of MacOS Dark Theme by stoatsnhoney
