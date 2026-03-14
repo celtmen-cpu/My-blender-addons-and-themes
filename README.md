@@ -1,2 +1,2 @@
 # macOS-Liquid-Glass-blender-theme
-C'est un theme blender emulant Liquid Glass sur macOS a partir d'un autre theme cree par stoatsnhoney
+This is a Blender theme emulating Liquid Glass on macOS, based on another theme created by stoatsnhoney.
