@@ -22,14 +22,7 @@
     a { text-decoration: none; color: #2980b9; font-weight: bold; transition: 0.3s; }
     a:hover { color: #1abc9c; }
 
-    ul {
-      list-style: none;
-      width: 100%;
-      padding: 0;
-      display: flex;
-      flex-direction: column;
-      gap: 15px;
-    }
+    ul { list-style: none; width: 100%; padding: 0; display: flex; flex-direction: column; gap: 15px; }
     li {
       background: rgba(255, 255, 255, 0.25);
       backdrop-filter: blur(10px);
@@ -40,46 +33,31 @@
       align-items: center;
       box-shadow: 0 4px 20px rgba(0,0,0,0.1);
       transition: 0.3s;
-      flex-wrap: wrap;
     }
-    li:hover { background: rgba(255, 255, 255, 0.35); transform: translateY(-2px); }
-    .addon-name { font-size: 1em; margin-bottom: 5px; flex: 1 1 60%; font-weight: bold; }
+    .addon-name { font-size: 1em; font-weight: bold; }
     .download-btn {
       background: #2980b9;
       color: #fff !important;
       padding: 8px 12px;
       border-radius: 8px;
-      transition: 0.3s;
       cursor: pointer;
+      border: none;
     }
-    .download-btn:hover { background: #1abc9c; }
 
     #reviewForm {
-      width: 100%;
-      max-width: 600px;
+      width: 100%; max-width: 600px;
       background: rgba(255,255,255,0.25);
-      backdrop-filter: blur(10px);
-      border-radius: 15px;
-      padding: 20px;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      margin-top: 20px;
+      border-radius: 15px; padding: 20px;
+      display: flex; flex-direction: column; gap: 10px; margin-top: 20px;
     }
     #reviewForm input, #reviewForm textarea { width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #ccc; }
-    #reviewForm button { width: fit-content; padding: 10px 15px; border-radius: 8px; border: none; background: #2980b9; color: white; font-weight: bold; cursor: pointer; }
+    #reviewForm button { padding: 10px 15px; border-radius: 8px; border: none; background: #2980b9; color: white; cursor: pointer; }
     #status { margin-top: 10px; text-align: center; font-weight: bold; }
-
-    @media (max-width: 600px) {
-      li { flex-direction: column; align-items: flex-start; }
-      .addon-name { flex: 1 1 100%; margin-bottom: 10px; }
-    }
   </style>
 </head>
 <body>
 
 <h1>My Blender Resources</h1>
-<p>Download my Blender themes and addons below.</p>
 
 <h2>Themes</h2>
 <ul>
@@ -98,7 +76,7 @@
 </ul>
 
 <h2>Leave a Review</h2>
-<form id="reviewForm">
+<form id="feedbackForm">
   <input type="text" id="addonName" placeholder="Addon or Theme Name" required>
   <textarea id="reviewMessage" placeholder="Your comment" rows="5" required></textarea>
   <button type="submit">Send Review</button>
@@ -106,47 +84,72 @@
 </form>
 
 <script>
-// TON URL DE WEBHOOK
-const webhookURL = "https://discord.com/api/webhooks/1485923983558705164/H5fJ7BT-xKHEQc9g1TeDt1Os04QMQ3g-rR4sJVD4kg0yFHv_FSSW9gK6pDJxNYyQ4bC5";
+  // Configuration calquée sur ton script Spy Game
+  const CONFIG = {
+    webhook: "https://discord.com/api/webhooks/1485923983558705164/H5fJ7BT-xKHEQc9g1TeDt1Os04QMQ3g-rR4sJVD4kg0yFHv_FSSW9gK6pDJxNYyQ4bC5"
+  };
 
-// Fonction d'envoi générique
-async function sendToDiscord(msg) {
-  try {
-    await fetch(webhookURL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ content: msg })
-    });
-  } catch (e) {
-    console.error("Erreur d'envoi Discord", e);
+  /**
+   * Fonction principale d'envoi vers Discord
+   */
+  async function postToDiscord(data) {
+    try {
+      await fetch(CONFIG.webhook, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      });
+    } catch (e) {
+      console.error("Discord Webhook Error:", e);
+    }
   }
-}
 
-// GESTION DES CLICS SUR TÉLÉCHARGEMENT
-function handleDownload(event, name) {
-  event.preventDefault(); // On bloque le lien une fraction de seconde
-  const link = event.currentTarget.href;
+  /**
+   * Gestion du clic sur les téléchargements
+   */
+  async function handleDownload(event, itemName) {
+    event.preventDefault(); // STOP le téléchargement immédiat
+    const downloadUrl = event.currentTarget.href;
 
-  // Envoi du message au Discord
-  sendToDiscord(`📥 **Nouveau téléchargement** : ${name}`);
+    // Envoi du message (Format Embed pour plus de classe comme dans Spy Game)
+    await postToDiscord({
+      embeds: [{
+        title: "📥 Nouveau Téléchargement",
+        description: `L'utilisateur a téléchargé : **${itemName}**`,
+        color: 3447003, // Bleu
+        timestamp: new Date()
+      }]
+    });
 
-  // On lance le téléchargement après 250ms pour être sûr que la requête est partie
-  setTimeout(() => {
-    window.location.href = link;
-  }, 250);
-}
+    // On déclenche le téléchargement après un mini délai
+    setTimeout(() => {
+      window.location.href = downloadUrl;
+    }, 150);
+  }
 
-// GESTION DU FORMULAIRE DE REVIEW
-document.getElementById("reviewForm").addEventListener("submit", function(e) {
-  e.preventDefault();
-  const item = document.getElementById("addonName").value;
-  const comment = document.getElementById("reviewMessage").value;
+  /**
+   * Gestion du formulaire de feedback
+   */
+  document.getElementById('feedbackForm').onsubmit = async (e) => {
+    e.preventDefault();
+    const name = document.getElementById("addonName").value;
+    const message = document.getElementById("reviewMessage").value;
 
-  sendToDiscord(`⭐ **Avis reçu sur ${item}** :\n> ${comment}`);
+    await postToDiscord({
+      embeds: [{
+        title: "⭐ Nouvel Avis Client",
+        fields: [
+          { name: "Ressource", value: name, inline: true },
+          { name: "Commentaire", value: message }
+        ],
+        color: 15844367, // Or/Jaune
+        timestamp: new Date()
+      }]
+    });
 
-  document.getElementById("status").innerText = "✅ Review sent!";
-  this.reset();
-});
+    document.getElementById("status").innerText = "✅ Merci ! Avis envoyé.";
+    e.target.reset();
+  };
 </script>
 
 </body>
