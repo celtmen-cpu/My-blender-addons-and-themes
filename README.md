@@ -14,6 +14,9 @@ It is a modified version of MacOS Dark Theme by stoatsnhoney
 ### Dimensions presets
 Automatically configures dimensions for thumbnails, banners, PDP
 
+### SpiderMan web shooting
+Do a geometry node web shoot
+
 </details>
 
 # About me
